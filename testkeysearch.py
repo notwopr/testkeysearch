@@ -4,6 +4,7 @@ PURPOSE: SEARCH FOR KEYS AND RECORD THEM.
 """
 # IMPORT TOOLS
 #   BUILTIN TOOLS
+import os
 from tkinter import messagebox
 import re
 import pickle as pkl
@@ -80,24 +81,30 @@ def jackpotsearch():
 
 # EXECUTION BEGINS HERE
 # I. PREP STAGE
-#   A. OPEN STORED FILE OF VISITED PAGES
-with open("visited.pkl", "rb") as targetfile:
-    visited_raw = pkl.load(targetfile)
 
-if visited_raw is None:
-    # IF NONE EXISTS, CREATE OBJECT
-    visited = []
-else:
-    visited = visited_raw
-    print(type(visited))
-    print("CURRENT LIST OF VISITED PAGES:\n", visited)
+#   A. SEARCH FOR EXISTENCE OF PICKLE FILE
+#       1. SEARCH FILE AND DIR NAMES FOR THE VISITED PAGES FILE
+for f_name in os.listdir('testkeysearch'):
+    if f_name.startswith('visited'):
+        print("Visited Pages File Found!")
+
+    #       a. OPEN STORED FILE OF VISITED PAGES AND STORE AS OBJECT
+        with open("visited.pkl", "rb") as targetfile:
+            visited_raw = pkl.load(targetfile)
+        visited = visited_raw
+        print(type(visited))
+        print("CURRENT LIST OF VISITED PAGES:\n", visited)
+
+    #       b. IF NONE EXISTS, CREATE OBJECT
+    else:
+        visited = []
 
 #   B. OPEN WEBPAGE
 driver = webdriver.Firefox()
 driver.get("https://keys.lol/bitcoin/random")
 humanurl = driver.current_url
 
-#   C. IF REDIRECTED, PASS TEST
+#   C. IF REDIRECTED, PASS TEST, THEN RUN REMAINDER OF PROGRAM
 if humanurl == "https://keys.lol/are-you-human":
     print("We've been redirected to: ", humanurl)
     # WAIT UNTIL I INPUT MY CREDENTIALS
