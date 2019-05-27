@@ -4,27 +4,81 @@ PURPOSE: SEARCH FOR KEYS AND RECORD THEM.
 """
 # IMPORT TOOLS
 #   BUILTIN TOOLS
-import tkinter as tk
 from tkinter import messagebox
+import re
 import pickle as pkl
 #   THIRD PARTY TOOLS
 from selenium import webdriver
 
 
-def getpagenum():
+# FIND UNIQUE PAGE AND RECORD IT IN HISTORY
+def getnewpage(visited):
     currenturl = driver.current_url
     pagenum = currenturl[25:]
-    print(pagenum)
-    return pagenum
+    while pagenum in visited:
+        randombutton = driver.find_element_by_xpath("//*[@class='my-4']/div/a[3]")
+        randombutton.click()
+    visited.append(pagenum)
 
 
-# CLICKS ON "RANDOM LINK"  AND RECORDS NEW PAGE
-def getnewpage():
-    randombutton = driver.find_element_by_xpath("//*[@class='my-4']/div/a[3]")
-    randombutton.click()
-    pagenum = getpagenum()
+def churn():
+
+    # GET UNIQUE PAGE
+    getnewpage(visited)
+
+    # SEARCH PAGE
+    pagetext = driver.find_element_by_tag_name("body").text
+    print(pagetext)
+    q = re.compile('[1-9]+ btc')
+
+    # TEST WHETHER REGEX WORKS
+    samplestr = "1402 btc"
+    print("sample test string to find: ", samplestr)
+    found = q.search(samplestr)
+    print("Search works!  --> ", found)
+
+    reobj = q.search(pagetext)
+    if reobj != "None":
+        # REPORT NEW JACKPOT URL
+        jackpoturl = driver.current_url
+        print("JACKPOT!  -->  ", jackpoturl)
 
 
+def record_jackpot(jackpoturl):
+
+    # OPEN STORED FILE OF JACKPOT PAGES
+    with open("jackpots.pkl", "rb") as targetfile:
+        jackpots_raw = pkl.load(targetfile)
+    if jackpots_raw is None:
+        # IF NONE EXISTS, CREATE OBJECT
+        jackpotlist = []
+    else:
+        jackpotlist = jackpots_raw
+        print(type(jackpotlist))
+        print("CURRENT LIST OF JACKPOT PAGES:\n {}\n\n".format(jackpotlist))
+
+    # ADD NEW JACKPOT URL TO LIST AND STORE UPDATED LIST TO PICKLE
+    jackpotlist.append(jackpoturl)
+    with open("jackpots.pkl", "wb") as targetfile:
+        pkl.dump(jackpotlist, targetfile, protocol=4)
+
+    # STORE UPDATED VISITED LIST TO PICKLE
+    print("UPDATED VISITED LIST:\n", visited)
+    with open("visited.pkl", "wb") as targetfile:
+        pkl.dump(visited, targetfile, protocol=4)
+    # STOP
+    exit()
+
+
+def jackpotsearch():
+    jackpoturl = ""
+    # UNTIL ACCOUNT IS FOUND, RUN:
+    while jackpoturl == "":
+        churn()
+    record_jackpot(jackpoturl)
+
+
+# EXECUTION BEGINS HERE
 # I. PREP STAGE
 #   A. OPEN STORED FILE OF VISITED PAGES
 with open("visited.pkl", "rb") as targetfile:
@@ -49,51 +103,20 @@ if humanurl == "https://keys.lol/are-you-human":
     # WAIT UNTIL I INPUT MY CREDENTIALS
     answer = messagebox.askokcancel("Are you ready for Python to continue?")
     if answer is True:
-        search()
+        jackpotsearch()
     else:
         exit()
 else:
-    search()
+    jackpotsearch()
 
 
-# UNTIL ACCOUNT IS FOUND, RUN:
-
-def search():
-    # FIND UNIQUE PAGE AND RECORD IT IN HISTORY
-    pagenum = getpagenum()
-    while pagenum in visited:
-        getnewpage()
-    visited.append(pagenum)
-
-    # SEARCH PAGE
-    # REPORT NEW JACKPOT URL
-    jackpoturl = driver.current_url
-    print("JACKPOT! -->", jackpoturl)
-
-    #   OPEN STORED FILE OF JACKPOT PAGES
-    with open("jackpots.pkl", "rb") as targetfile:
-        jackpots_raw = pkl.load(targetfile)
-    if jackpots_raw is None:
-        # IF NONE EXISTS, CREATE OBJECT
-        jackpotlist = []
-    else:
-        jackpotlist = jackpots_raw
-        print(type(jackpotlist))
-        print("CURRENT LIST OF JACKPOT PAGES:\n {}\n\n".format(jackpotlist))
-
-    # ADD NEW JACKPOT URL TO LIST AND STORE UPDATED LIST TO PICKLE
-    jackpotlist.append(jackpoturl)
-    with open("jackpots.pkl", "wb") as targetfile:
-        pkl.dump(jackpotlist, targetfile, protocol=4)
-
-    # STORE UPDATED VISITED LIST TO PICKLE
-    print("UPDATED VISITED LIST:\n", visited)
-    with open("visited.pkl", "wb") as targetfile:
-        pkl.dump(visited, targetfile, protocol=4)
-    # STOP
-    exit()
 
 
-# HOW TO RUN THIS IN BACKGROUND USING THE CLOUD?
-# CAVEATS
-#   old pages may have new balances.
+
+
+
+
+
+# ISSUES TO ADDRESS:
+#   how to run this in background using the cloud?
+#   visited pages may have new balances after you have visited them.
