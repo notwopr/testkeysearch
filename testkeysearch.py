@@ -33,16 +33,19 @@ def churn():
     q = re.compile('[1-9]+ btc')
 
     # TEST WHETHER REGEX WORKS
-    samplestr = "1402 btc"
-    print("sample test string to find: ", samplestr)
-    found = q.search(samplestr)
-    print("Search works!  --> ", found)
+    samplestr = "aerbaer regae4tnb4a3t34na34an a4 1,014.020 btcaw4nta4ta 4w"
+    print("sample test string to search: ", samplestr)
+    found = re.findall('[1-9]+ btc', samplestr)
+    print("found= ", found)
 
-    reobj = q.search(pagetext)
-    if reobj != "None":
+    found = re.findall('[1-9]+ btc', pagetext)
+    print("FOUND STRING MATCH:", found)
+    if len(found) != 0:
         # REPORT NEW JACKPOT URL
         jackpoturl = driver.current_url
         print("JACKPOT!  -->  ", jackpoturl)
+    else:
+        print("NO POSITIVE BTC ACCOUNT BALANCES FOUND! :_(")
 
 
 def record_jackpot(jackpoturl):
@@ -84,7 +87,8 @@ def jackpotsearch():
 
 #   A. SEARCH FOR EXISTENCE OF PICKLE FILE
 #       1. SEARCH FILE AND DIR NAMES FOR THE VISITED PAGES FILE
-for f_name in os.listdir('testkeysearch'):
+visited = []
+for f_name in os.listdir('F:\\Google Drive\\Goals\\Random Projects\\testkeysearch\\'):
     if f_name.startswith('visited'):
         print("Visited Pages File Found!")
 
@@ -96,8 +100,8 @@ for f_name in os.listdir('testkeysearch'):
         print("CURRENT LIST OF VISITED PAGES:\n", visited)
 
     #       b. IF NONE EXISTS, CREATE OBJECT
-    else:
-        visited = []
+if len(visited) == 0:
+    print("No visited pages pickle file found. Creating new list...")
 
 #   B. OPEN WEBPAGE
 driver = webdriver.Firefox()
