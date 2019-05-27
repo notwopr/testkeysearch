@@ -131,3 +131,4 @@ else:
 # ISSUES TO ADDRESS:
 #   how to run this in background using the cloud?
 #   visited pages may have new balances after you have visited them.
+# fix regex search to find "{} btc" where {} is not " 0"
