@@ -10,77 +10,69 @@ import pickle as pkl
 #   THIRD PARTY TOOLS
 from selenium import webdriver
 
-# OPEN STORED FILE OF VISITED PAGES
+
+def getpagenum():
+    currenturl = driver.current_url
+    pagenum = currenturl[25:]
+    print(pagenum)
+    return pagenum
+
+
+# CLICKS ON "RANDOM LINK"  AND RECORDS NEW PAGE
+def getnewpage():
+    randombutton = driver.find_element_by_xpath("//*[@class='my-4']/div/a[3]")
+    randombutton.click()
+    pagenum = getpagenum()
+
+
+# I. PREP STAGE
+#   A. OPEN STORED FILE OF VISITED PAGES
 with open("visited.pkl", "rb") as targetfile:
     visited_raw = pkl.load(targetfile)
 
-
-if history_raw is None:
+if visited_raw is None:
     # IF NONE EXISTS, CREATE OBJECT
     visited = []
 else:
-    visited = history_raw
+    visited = visited_raw
     print(type(visited))
+    print("CURRENT LIST OF VISITED PAGES:\n", visited)
 
-
-# OPEN WEBPAGE
+#   B. OPEN WEBPAGE
 driver = webdriver.Firefox()
 driver.get("https://keys.lol/bitcoin/random")
 humanurl = driver.current_url
 
-# IF REDIRECTED, PASS TEST
+#   C. IF REDIRECTED, PASS TEST
 if humanurl == "https://keys.lol/are-you-human":
     print("We've been redirected to: ", humanurl)
     # WAIT UNTIL I INPUT MY CREDENTIALS
     answer = messagebox.askokcancel("Are you ready for Python to continue?")
     if answer is True:
-        unique()
+        search()
     else:
         exit()
 else:
-    unique()
+    search()
 
 
-# FUNCTION SEARCHES FOR UNIQUE PAGE YOU HAVEN'T VISITED, AND RECORDS NEW UNIQUE PAGE
-def unique():
-
-    # STORE NAME OF PAGE
-    getpageslice()
-
-
-
-    # IF MATCHES LIST OF VISITED PAGES,
-    if sliced in visited:
-
-        # CLICK ON "RANDOM LINK"
-        randombutton = driver.find_element_by_xpath("//*[@class="my-4"]/div/a[3]")
-        randombutton.click()
-        getpageslice()
-
-    # IF NOT,
-    #   RECORD PAGE TO LIST OF VISITED PAGES
-    else:
-        visited.append(sliced)
-        # RUN SEARCH()
-
+# UNTIL ACCOUNT IS FOUND, RUN:
 
 def search():
-    # SEARCH WEBPAGE
-    # IF FOUND,
-    if asdf :
+    # FIND UNIQUE PAGE AND RECORD IT IN HISTORY
+    pagenum = getpagenum()
+    while pagenum in visited:
+        getnewpage()
+    visited.append(pagenum)
+
+    # SEARCH PAGE
         # RECORD WEBLINK
         # STORE UPDATED VISITED LIST TO PICKLE
-        with open("tickerdb.pkl", "wb") as targetfile:
-            pkl.dump(finalfile, targetfile, protocol=4)
+        print("UPDATED VISITED LIST:\n", visited)
+        with open("visited.pkl", "wb") as targetfile:
+            pkl.dump(visited, targetfile, protocol=4)
         # STOP
+        exit()
 
-    # IF NOT,
-    else:
-
-        # CLICK ON "RANDOM LINK"
-        randombutton = driver.find_element_by_xpath("//*[@class="my-4"]/div/a[3]")
-        randombutton.click()
-
-        # RETURN TO
 
         # HOW TO RUN THIS IN BACKGROUND USING THE CLOUD?
