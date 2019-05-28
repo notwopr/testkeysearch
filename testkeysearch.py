@@ -8,6 +8,7 @@ import os
 from tkinter import messagebox
 import re
 import pickle as pkl
+
 #   THIRD PARTY TOOLS
 from selenium import webdriver
 
@@ -29,14 +30,30 @@ def churn():
     getnewpage(visited)
 
     # TEST WHETHER REGEX WORKS
-    samplestr = "aerbaer regae4tnb4a3t34na34an a4 1,014.020 btcaw4nta4ta 4w"
+    samplestr = "aerbaer regae4tnb4a3t34na34an a4 12,524,675.00 btcaw4nta4ta 4w"
     print("sample test string to search: ", samplestr)
-    found = re.findall('[1-9]+ btc', samplestr)
+    found = (
+        re.findall(" [0-9]+ btc", samplestr)
+        + re.findall(" \.[0-9]+ btc", samplestr)
+        + re.findall(" [0-9]+\. btc", samplestr)
+        + re.findall(" [0-9]+\.[0-9]+ btc", samplestr)
+        + re.findall("[0-9]{1,3}(?:,[0-9]{3})+ btc", samplestr)
+        + re.findall("[0-9]{1,3}(?:,[0-9]{3})+\. btc", samplestr)
+        + re.findall("[0-9]{1,3}(?:,[0-9]{3})+\.[0-9]+ btc", samplestr)
+    )
     print("found= ", found)
 
     # SEARCH PAGE
     pagetext = driver.find_element_by_tag_name("body").text
-    found = re.findall('[1-9]+ btc', pagetext)
+    found = (
+        re.findall(" [0-9]+ btc", pagetext)
+        + re.findall(" \.[0-9]+ btc", pagetext)
+        + re.findall(" [0-9]+\. btc", pagetext)
+        + re.findall(" [0-9]+\.[0-9]+ btc", pagetext)
+        + re.findall("[0-9]{1,3}(?:,[0-9]{3})+ btc", pagetext)
+        + re.findall("[0-9]{1,3}(?:,[0-9]{3})+\. btc", pagetext)
+        + re.findall("[0-9]{1,3}(?:,[0-9]{3})+\.[0-9]+ btc", pagetext)
+    )
     print("FOUND STRING MATCH:", found)
     if len(found) != 0:
         # REPORT NEW JACKPOT URL
@@ -75,7 +92,8 @@ def record_jackpot(jackpoturl):
 def jackpotsearch():
     jackpoturl = ""
     # UNTIL ACCOUNT IS FOUND, RUN:
-    while jackpoturl == "":
+    # while jackpoturl == "":
+    for i in range(0, 10):
         churn()
     record_jackpot(jackpoturl)
 
@@ -86,11 +104,11 @@ def jackpotsearch():
 #   A. SEARCH FOR EXISTENCE OF PICKLE FILE
 #       1. SEARCH FILE AND DIR NAMES FOR THE VISITED PAGES FILE
 visited = []
-for f_name in os.listdir('F:\\Google Drive\\Goals\\Random Projects\\testkeysearch\\'):
-    if f_name.startswith('visited'):
+for f_name in os.listdir("F:\\Google Drive\\Goals\\Random Projects\\testkeysearch\\"):
+    if f_name.startswith("visited"):
         print("Visited Pages File Found!")
 
-    #       a. OPEN STORED FILE OF VISITED PAGES AND STORE AS OBJECT
+        #       a. OPEN STORED FILE OF VISITED PAGES AND STORE AS OBJECT
         with open("visited.pkl", "rb") as targetfile:
             visited_raw = pkl.load(targetfile)
         visited = visited_raw
@@ -117,13 +135,6 @@ if humanurl == "https://keys.lol/are-you-human":
         exit()
 else:
     jackpotsearch()
-
-
-
-
-
-
-
 
 
 # ISSUES TO ADDRESS:
