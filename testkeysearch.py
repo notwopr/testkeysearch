@@ -46,7 +46,7 @@ def record_jackpot(jackpoturl):
 # SEARCH PAGE FOR JACKPOTS
 def searchtext():
     # SEARCH PAGE FOR ANY "X btc" where X is any number (float or integer) > 0.
-    pagetext = driver.find_element_by_tag_name("body").text
+    pagetext = "awevaweibnvaoiew aefna eiowf awenin oiaeion 294120 btc ag4ha348fhewufawug" #driver.find_element_by_tag_name("body").text
     print("Pagetext type:", type(pagetext))
     found = (
         re.findall(" [0-9]*[1-9] btc", pagetext)
