@@ -20,6 +20,7 @@ def getnewpage(visited):
         randombutton = driver.find_element_by_xpath("//*[@class='my-4']/div/a[3]")
         randombutton.click()
     visited.append(pagenum)
+    print(visited)
 
 
 def churn():
@@ -27,17 +28,14 @@ def churn():
     # GET UNIQUE PAGE
     getnewpage(visited)
 
-    # SEARCH PAGE
-    pagetext = driver.find_element_by_tag_name("body").text
-    print(pagetext)
-    q = re.compile('[1-9]+ btc')
-
     # TEST WHETHER REGEX WORKS
     samplestr = "aerbaer regae4tnb4a3t34na34an a4 1,014.020 btcaw4nta4ta 4w"
     print("sample test string to search: ", samplestr)
     found = re.findall('[1-9]+ btc', samplestr)
     print("found= ", found)
 
+    # SEARCH PAGE
+    pagetext = driver.find_element_by_tag_name("body").text
     found = re.findall('[1-9]+ btc', pagetext)
     print("FOUND STRING MATCH:", found)
     if len(found) != 0:
