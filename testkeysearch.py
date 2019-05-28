@@ -13,118 +13,124 @@ import pickle as pkl
 from selenium import webdriver
 
 
-# FIND UNIQUE PAGE AND RECORD IT IN HISTORY
-def getnewpage(visited):
-    currenturl = driver.current_url
-    pagenum = currenturl[25:]
-    while pagenum in visited:
-        randombutton = driver.find_element_by_xpath("//*[@class='my-4']/div/a[3]")
-        randombutton.click()
-    visited.append(pagenum)
-    print(visited)
+# RECORD NEW JACKPOT URL TO JACKPOTS FILE AND EXIT PROGRAM
+def record_jackpot(jackpoturl):
+
+    # SEARCH FOR EXISTENCE OF JACKPOT PICKLE FILE
+    jackpotlist = []
+    for f_name in os.listdir("F:\\Google Drive\\Goals\\Random Projects\\testkeysearch\\"):
+        if f_name.startswith("jackpotlist"):
+            print("Jackpot File Found!")
+
+            # OPEN STORED JACKPOT FILE AND STORE CONTENTS AS LIST OBJECT
+            with open("jackpotlist.pkl", "rb") as targetfile:
+                jackpotlist_raw = pkl.load(targetfile)
+            jackpotlist = jackpotlist_raw
+            print("Jackpot Data Type: ", type(jackpotlist))
+            print("CURRENT LIST OF JACKPOTS:\n", jackpotlist)
+
+    # IF NONE EXISTS, REPORT SO
+    if len(jackpotlist) == 0:
+        print("No Jackpot pickle file found.")
+
+    # ADD NEW JACKPOT URL TO LIST AND STORE UPDATED LIST TO PICKLE
+    jackpotlist.append(jackpoturl)
+    print("JACKPOTLIST NEW ADDITION: ", jackpoturl)
+    print("UPDATED LIST OF JACKPOTS:\n", jackpotlist)
+    with open("jackpotlist.pkl", "wb") as targetfile:
+        pkl.dump(jackpotlist, targetfile, protocol=4)
+
+    exit()
 
 
-def churn():
-
-    # GET UNIQUE PAGE
-    getnewpage(visited)
-
-    # TEST WHETHER REGEX WORKS
-    samplestr = "aerbaer regae4tnb4a3t34na34an a4 12,524,675.00 btcaw4nta4ta 4w"
-    print("sample test string to search: ", samplestr)
-    found = (
-        re.findall(" [0-9]+ btc", samplestr)
-        + re.findall(" \.[0-9]+ btc", samplestr)
-        + re.findall(" [0-9]+\. btc", samplestr)
-        + re.findall(" [0-9]+\.[0-9]+ btc", samplestr)
-        + re.findall("[0-9]{1,3}(?:,[0-9]{3})+ btc", samplestr)
-        + re.findall("[0-9]{1,3}(?:,[0-9]{3})+\. btc", samplestr)
-        + re.findall("[0-9]{1,3}(?:,[0-9]{3})+\.[0-9]+ btc", samplestr)
-    )
-    print("found= ", found)
-
-    # SEARCH PAGE
+# SEARCH PAGE FOR JACKPOTS
+def searchtext():
+    # SEARCH PAGE FOR ANY "X btc" where X is any number (float or integer) > 0.
     pagetext = driver.find_element_by_tag_name("body").text
     found = (
-        re.findall(" [0-9]+ btc", pagetext)
+        re.findall(" [0-9]*[1-9] btc", pagetext)
+        + re.findall(" [0-9]*[1-9]0+ btc", pagetext)
         + re.findall(" \.[0-9]+ btc", pagetext)
-        + re.findall(" [0-9]+\. btc", pagetext)
         + re.findall(" [0-9]+\.[0-9]+ btc", pagetext)
         + re.findall("[0-9]{1,3}(?:,[0-9]{3})+ btc", pagetext)
         + re.findall("[0-9]{1,3}(?:,[0-9]{3})+\. btc", pagetext)
         + re.findall("[0-9]{1,3}(?:,[0-9]{3})+\.[0-9]+ btc", pagetext)
     )
-    print("FOUND STRING MATCH:", found)
+    # IF JACKPOT FOUND, REPORT IT AND RECORD IT
     if len(found) != 0:
-        # REPORT NEW JACKPOT URL
         jackpoturl = driver.current_url
         print("JACKPOT!  -->  ", jackpoturl)
+        record_jackpot(jackpoturl)
+    # OTHERWISE, REPORT THAT JACKPOT WAS NOT FOUND
     else:
         print("NO POSITIVE BTC ACCOUNT BALANCES FOUND! :_(")
 
 
-def record_jackpot(jackpoturl):
+# CHECK IF CURRENT PAGE HAS ALREADY BEEN VISITED
+def checkifvisited():
+    currenturl = driver.current_url
+    pagenum = currenturl[25:]
+    print("Current URL: ", pagenum)
 
-    # OPEN STORED FILE OF JACKPOT PAGES
-    with open("jackpots.pkl", "rb") as targetfile:
-        jackpots_raw = pkl.load(targetfile)
-    if jackpots_raw is None:
-        # IF NONE EXISTS, CREATE OBJECT
-        jackpotlist = []
+    # SEARCH FOR EXISTENCE OF VISITED PAGES PICKLE FILE
+    visited = []
+    for f_name in os.listdir("F:\\Google Drive\\Goals\\Random Projects\\testkeysearch\\"):
+
+        # IF EXISTS, OPEN STORED FILE OF VISITED PAGES AND STORE CONTENTS AS LIST OBJECT
+        if f_name.startswith("visited"):
+            print("Visited Pages File Found!")
+            with open("visited.pkl", "rb") as targetfile:
+                visited_raw = pkl.load(targetfile)
+            visited = visited_raw
+            print("VISITED DATA TYPE: ", type(visited))
+            print("CURRENT LIST OF VISITED PAGES:\n", visited)
+
+    # IF NONE EXISTS, REPORT SO
+    if len(visited) == 0:
+        print("No visited pages pickle file found.")
+
+    # IF CURRENT PAGE NOT VISITED BEFORE, ADD PAGE TO VISITED PAGES PICKLE FILE
+    if pagenum not in visited:
+        visited.append(pagenum)
+        print("UPDATED VISITED LIST:\n", visited)
+        with open("visited.pkl", "wb") as targetfile:
+            pkl.dump(visited, targetfile, protocol=4)
+    # AND RETURN BOOLEAN
+        return False
+    # OTHERWISE JUST RETURN BOOLEAN
     else:
-        jackpotlist = jackpots_raw
-        print(type(jackpotlist))
-        print("CURRENT LIST OF JACKPOT PAGES:\n {}\n\n".format(jackpotlist))
+        return True
 
-    # ADD NEW JACKPOT URL TO LIST AND STORE UPDATED LIST TO PICKLE
-    jackpotlist.append(jackpoturl)
-    with open("jackpots.pkl", "wb") as targetfile:
-        pkl.dump(jackpotlist, targetfile, protocol=4)
 
-    # STORE UPDATED VISITED LIST TO PICKLE
-    print("UPDATED VISITED LIST:\n", visited)
-    with open("visited.pkl", "wb") as targetfile:
-        pkl.dump(visited, targetfile, protocol=4)
-    # STOP
-    exit()
+def getnewpage():
+    randombutton = driver.find_element_by_xpath("//*[@class='my-4']/div/a[3]")
+    randombutton.click()
 
 
 def jackpotsearch():
-    jackpoturl = ""
-    # UNTIL ACCOUNT IS FOUND, RUN:
-    # while jackpoturl == "":
-    for i in range(0, 10):
-        churn()
-    record_jackpot(jackpoturl)
+    '''
+    counter = 0
+    while True:
+        print("TRIAL ", counter)
+    '''
+    for i in range(1, 11):
+        print("TRIAL ", i)
+        boolean = checkifvisited()
+        print("Have we visited the current page? ", boolean)
+        if boolean == "False":
+            searchtext()
+            getnewpage()
+        else:
+            getnewpage()
+    #   counter += 1
 
 
 # EXECUTION BEGINS HERE
-# I. PREP STAGE
-
-#   A. SEARCH FOR EXISTENCE OF PICKLE FILE
-#       1. SEARCH FILE AND DIR NAMES FOR THE VISITED PAGES FILE
-visited = []
-for f_name in os.listdir("F:\\Google Drive\\Goals\\Random Projects\\testkeysearch\\"):
-    if f_name.startswith("visited"):
-        print("Visited Pages File Found!")
-
-        #       a. OPEN STORED FILE OF VISITED PAGES AND STORE AS OBJECT
-        with open("visited.pkl", "rb") as targetfile:
-            visited_raw = pkl.load(targetfile)
-        visited = visited_raw
-        print(type(visited))
-        print("CURRENT LIST OF VISITED PAGES:\n", visited)
-
-    #       b. IF NONE EXISTS, CREATE OBJECT
-if len(visited) == 0:
-    print("No visited pages pickle file found. Creating new list...")
-
-#   B. OPEN WEBPAGE
 driver = webdriver.Firefox()
 driver.get("https://keys.lol/bitcoin/random")
 humanurl = driver.current_url
 
-#   C. IF REDIRECTED, PASS TEST, THEN RUN REMAINDER OF PROGRAM
+# IF REDIRECTED, PASS TEST, THEN RUN REMAINDER OF PROGRAM
 if humanurl == "https://keys.lol/are-you-human":
     print("We've been redirected to: ", humanurl)
     # WAIT UNTIL I INPUT MY CREDENTIALS
@@ -140,4 +146,17 @@ else:
 # ISSUES TO ADDRESS:
 #   how to run this in background using the cloud?
 #   visited pages may have new balances after you have visited them.
-# fix regex search to find "{} btc" where {} is not " 0"
+''' REGEX BELOW CAPTURES ANY REAL NUMBER INTEGERS, OR FLOATS INCLUDING COMMA NOTATION
+    samplestr = "aerbaer regae4tnb4a3t34na34an a4 12,524,675.00 btcaw4nta4ta 4w"
+    print("sample test string to search: ", samplestr)
+    found = (
+        re.findall(" [0-9]+ btc", samplestr)
+        + re.findall(" \.[0-9]+ btc", samplestr)
+        + re.findall(" [0-9]+\. btc", samplestr)
+        + re.findall(" [0-9]+\.[0-9]+ btc", samplestr)
+        + re.findall("[0-9]{1,3}(?:,[0-9]{3})+ btc", samplestr)
+        + re.findall("[0-9]{1,3}(?:,[0-9]{3})+\. btc", samplestr)
+        + re.findall("[0-9]{1,3}(?:,[0-9]{3})+\.[0-9]+ btc", samplestr)
+    )
+    print("found= ", found)
+'''
