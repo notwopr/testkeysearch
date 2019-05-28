@@ -47,6 +47,7 @@ def record_jackpot(jackpoturl):
 def searchtext():
     # SEARCH PAGE FOR ANY "X btc" where X is any number (float or integer) > 0.
     pagetext = driver.find_element_by_tag_name("body").text
+    print("Pagetext type:", type(pagetext))
     found = (
         re.findall(" [0-9]*[1-9] btc", pagetext)
         + re.findall(" [0-9]*[1-9]0+ btc", pagetext)
@@ -117,7 +118,7 @@ def jackpotsearch():
         print("TRIAL ", i)
         boolean = checkifvisited()
         print("Have we visited the current page? ", boolean)
-        if boolean == "False":
+        if boolean is False:
             searchtext()
             getnewpage()
         else:
