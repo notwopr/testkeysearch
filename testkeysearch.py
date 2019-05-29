@@ -25,12 +25,12 @@ def record_jackpot(jackpoturl):
             with open("jackpotlist.pkl", "rb") as targetfile:
                 jackpotlist_raw = pkl.load(targetfile)
             jackpotlist = jackpotlist_raw
-            print("CURRENT LIST OF JACKPOTS:\n", jackpotlist)
+            #print("CURRENT LIST OF JACKPOTS:\n", jackpotlist)
 
     # ADD NEW JACKPOT URL TO LIST AND STORE UPDATED LIST TO PICKLE
     jackpotlist.append(jackpoturl)
-    print("JACKPOTLIST NEW ADDITION: ", jackpoturl)
-    print("UPDATED LIST OF JACKPOTS:\n", jackpotlist)
+    #print("JACKPOTLIST NEW ADDITION: ", jackpoturl)
+    #print("UPDATED LIST OF JACKPOTS:\n", jackpotlist)
     with open("jackpotlist.pkl", "wb") as targetfile:
         pkl.dump(jackpotlist, targetfile, protocol=4)
 
@@ -41,7 +41,7 @@ def record_jackpot(jackpoturl):
 def searchtext():
     # SEARCH PAGE FOR ANY "X btc" where X is any number (float or integer) > 0.
     pagetext = driver.find_element_by_tag_name("body").text
-    print("Pagetext type:", type(pagetext))
+    #print("Pagetext type:", type(pagetext))
     found = (
         re.findall(" [0-9]*[1-9] btc", pagetext)
         + re.findall(" [0-9]*[1-9]0+ btc", pagetext)
@@ -64,7 +64,7 @@ def searchtext():
 def checkifvisited():
     currenturl = driver.current_url
     pagenum = currenturl[25:]
-    print("Current URL: ", pagenum)
+    #print("Current URL: ", pagenum)
 
     # SEARCH FOR EXISTENCE OF VISITED PAGES PICKLE FILE
     visited = []
@@ -75,12 +75,12 @@ def checkifvisited():
             with open("visited.pkl", "rb") as targetfile:
                 visited_raw = pkl.load(targetfile)
             visited = visited_raw
-            print("CURRENT LIST OF VISITED PAGES:\n", visited)
+            #print("CURRENT LIST OF VISITED PAGES:\n", visited)
 
     # IF CURRENT PAGE NOT VISITED BEFORE, ADD PAGE TO VISITED PAGES PICKLE FILE
     if pagenum not in visited:
         visited.append(pagenum)
-        print("UPDATED VISITED LIST:\n", visited)
+        #print("UPDATED VISITED LIST:\n", visited)
         with open("visited.pkl", "wb") as targetfile:
             pkl.dump(visited, targetfile, protocol=4)
     # AND RETURN BOOLEAN
@@ -99,9 +99,9 @@ def jackpotsearch():
 
     counter = 0
     while True:
-        print("TRIAL ", counter)
+        #print("TRIAL ", counter)
         boolean = checkifvisited()
-        print("Have we visited the current page? ", boolean)
+        #print("Have we visited the current page? ", boolean)
         if boolean is False:
             searchtext()
             getnewpage()
