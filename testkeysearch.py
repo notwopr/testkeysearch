@@ -75,12 +75,14 @@ def checkifvisited():
             with open("visited.pkl", "rb") as targetfile:
                 visited_raw = pkl.load(targetfile)
             visited = visited_raw
+            print("# PAGES VISITED BEFORE: ", len(visited))
             #print("CURRENT LIST OF VISITED PAGES:\n", visited)
 
     # IF CURRENT PAGE NOT VISITED BEFORE, ADD PAGE TO VISITED PAGES PICKLE FILE
     if pagenum not in visited:
         visited.append(pagenum)
         #print("UPDATED VISITED LIST:\n", visited)
+        print("# PAGES VISITED AFTER: ", len(visited))
         with open("visited.pkl", "wb") as targetfile:
             pkl.dump(visited, targetfile, protocol=4)
     # AND RETURN BOOLEAN
