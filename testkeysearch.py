@@ -20,18 +20,12 @@ def record_jackpot(jackpoturl):
     jackpotlist = []
     for f_name in os.listdir("F:\\Google Drive\\Goals\\Random Projects\\testkeysearch\\"):
         if f_name.startswith("jackpotlist"):
-            print("Jackpot File Found!")
 
             # OPEN STORED JACKPOT FILE AND STORE CONTENTS AS LIST OBJECT
             with open("jackpotlist.pkl", "rb") as targetfile:
                 jackpotlist_raw = pkl.load(targetfile)
             jackpotlist = jackpotlist_raw
-            print("Jackpot Data Type: ", type(jackpotlist))
             print("CURRENT LIST OF JACKPOTS:\n", jackpotlist)
-
-    # IF NONE EXISTS, REPORT SO
-    if len(jackpotlist) == 0:
-        print("No Jackpot pickle file found.")
 
     # ADD NEW JACKPOT URL TO LIST AND STORE UPDATED LIST TO PICKLE
     jackpotlist.append(jackpoturl)
@@ -60,7 +54,6 @@ def searchtext():
     # IF JACKPOT FOUND, REPORT IT AND RECORD IT
     if len(found) != 0:
         jackpoturl = driver.current_url
-        print("JACKPOT!  -->  ", jackpoturl)
         record_jackpot(jackpoturl)
     # OTHERWISE, REPORT THAT JACKPOT WAS NOT FOUND
     else:
@@ -79,16 +72,10 @@ def checkifvisited():
 
         # IF EXISTS, OPEN STORED FILE OF VISITED PAGES AND STORE CONTENTS AS LIST OBJECT
         if f_name.startswith("visited"):
-            print("Visited Pages File Found!")
             with open("visited.pkl", "rb") as targetfile:
                 visited_raw = pkl.load(targetfile)
             visited = visited_raw
-            print("VISITED DATA TYPE: ", type(visited))
             print("CURRENT LIST OF VISITED PAGES:\n", visited)
-
-    # IF NONE EXISTS, REPORT SO
-    if len(visited) == 0:
-        print("No visited pages pickle file found.")
 
     # IF CURRENT PAGE NOT VISITED BEFORE, ADD PAGE TO VISITED PAGES PICKLE FILE
     if pagenum not in visited:
@@ -109,13 +96,10 @@ def getnewpage():
 
 
 def jackpotsearch():
-    '''
+
     counter = 0
     while True:
         print("TRIAL ", counter)
-    '''
-    for i in range(1, 11):
-        print("TRIAL ", i)
         boolean = checkifvisited()
         print("Have we visited the current page? ", boolean)
         if boolean is False:
@@ -123,7 +107,7 @@ def jackpotsearch():
             getnewpage()
         else:
             getnewpage()
-    #   counter += 1
+        counter += 1
 
 
 # EXECUTION BEGINS HERE
@@ -133,7 +117,6 @@ humanurl = driver.current_url
 
 # IF REDIRECTED, PASS TEST, THEN RUN REMAINDER OF PROGRAM
 if humanurl == "https://keys.lol/are-you-human":
-    print("We've been redirected to: ", humanurl)
     # WAIT UNTIL I INPUT MY CREDENTIALS
     answer = messagebox.askokcancel("Are you ready for Python to continue?")
     if answer is True:
